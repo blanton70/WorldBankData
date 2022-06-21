@@ -6,4 +6,8 @@ dash_html_components
 plotly.express 
 jupyter_dash 
 voila
+
 jupyter_server
+
+voila-material
+bqplot
