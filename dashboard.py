@@ -47,11 +47,23 @@ year_data = data[data['year'] == selected_year]
 
 # Country selection
 all_countries = sorted(year_data['country'].dropna().unique())
-selected_countries = st.multiselect(
-    "Select Countries",
-    options=all_countries,
-    default=all_countries[:5]
-)
+st.subheader("Country Selection")
+
+select_all = st.checkbox("Select all countries", value=False)
+
+if select_all:
+    selected_countries = st.multiselect(
+        "Select Countries",
+        options=all_countries,
+        default=all_countries
+    )
+else:
+    selected_countries = st.multiselect(
+        "Select Countries",
+        options=all_countries,
+        default=all_countries[:5]
+    )
+
 
 # Filter for selected countries
 filtered = year_data[year_data['country'].isin(selected_countries)]
