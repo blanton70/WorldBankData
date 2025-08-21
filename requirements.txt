@@ -1,4 +1,6 @@
+streamlit
 pandas 
+plotly
 numpy
 dash
 dash_core_components 
