@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 
 st.set_page_config(page_title="Country Dashboard", layout="wide")
-st.title("📊 World Bank Country Indicator Dashboard")
+st.title("📊 Merged Country Indicator Dashboard")
 
 @st.cache_data
 def load_and_merge():
@@ -58,9 +58,7 @@ with col_plot:
     pivot = filtered.pivot(index="country", columns="indicator", values="value").reset_index()
 
     if x_indicator in pivot.columns and y_indicator in pivot.columns:
-        # Radio buttons inside col_plot but below plot placeholder
         y_scale = st.radio("Y-axis Scale", ["Linear", "Logarithmic"], horizontal=True, key="scale")
-
         log_y = (y_scale == "Logarithmic")
 
         fig = px.scatter(
@@ -73,6 +71,15 @@ with col_plot:
             log_y=log_y
         )
         fig.update_traces(marker=dict(size=12), textposition="top center")
+        # Dark theme layout
+        fig.update_layout(
+            plot_bgcolor='#222222',
+            paper_bgcolor='#222222',
+            font=dict(color='white'),
+            xaxis=dict(showgrid=True, gridcolor='#444444', zerolinecolor='#666666'),
+            yaxis=dict(showgrid=True, gridcolor='#444444', zerolinecolor='#666666'),
+            title_font=dict(color='white'),
+        )
         st.plotly_chart(fig, use_container_width=True)
 
     else:
