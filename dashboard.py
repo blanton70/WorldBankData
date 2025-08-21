@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 
 st.set_page_config(page_title="Country Dashboard", layout="wide")
-st.title("📊 Merged Country Indicator Dashboard")
+st.title("📊 World Bank Country Indicator Dashboard")
 
 @st.cache_data
 def load_and_merge():
