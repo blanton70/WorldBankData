@@ -4,7 +4,6 @@ import plotly.express as px
 
 st.set_page_config(page_title="Country Dashboard", layout="wide")
 st.title("📊 Merged Country Indicator Dashboard")
-st.text("*not all years contain data")
 
 @st.cache_data
 def load_and_merge():
@@ -32,6 +31,7 @@ year_data = data[data['year'] == selected_year]
 all_countries = sorted(year_data['country'].dropna().unique())
 available_indicators = sorted(year_data['indicator'].dropna().unique())
 
+# Layout for controls and plot
 col_controls, col_plot = st.columns([1, 3])
 
 with col_controls:
@@ -51,6 +51,7 @@ with col_controls:
             default=all_countries[:5],
             key="countries"
         )
+
     x_indicator = st.selectbox("X-axis Indicator", available_indicators, index=0, key="x_ind")
     y_indicator = st.selectbox("Y-axis Indicator", available_indicators, index=1, key="y_ind")
 
@@ -59,7 +60,14 @@ with col_plot:
     pivot = filtered.pivot(index="country", columns="indicator", values="value").reset_index()
 
     if x_indicator in pivot.columns and y_indicator in pivot.columns:
-        y_scale = st.radio("Y-axis Scale", ["Linear", "Logarithmic"], horizontal=True, key="scale")
+        st.markdown("### Axis Scale Settings")
+        col_x, col_y = st.columns(2)
+        with col_x:
+            x_scale = st.radio("X-axis Scale", ["Linear", "Logarithmic"], horizontal=True, key="x_scale")
+        with col_y:
+            y_scale = st.radio("Y-axis Scale", ["Linear", "Logarithmic"], horizontal=True, key="y_scale")
+
+        log_x = (x_scale == "Logarithmic")
         log_y = (y_scale == "Logarithmic")
 
         fig = px.scatter(
@@ -67,12 +75,12 @@ with col_plot:
             x=x_indicator,
             y=y_indicator,
             text="country",
-            title=f"{y_indicator} vs {x_indicator} in {selected_year} ({y_scale} scale)",
+            title=f"{y_indicator} vs {x_indicator} in {selected_year}",
             height=600,
+            log_x=log_x,
             log_y=log_y
         )
         fig.update_traces(marker=dict(size=12), textposition="top center")
-        # Dark theme layout
         fig.update_layout(
             plot_bgcolor='#222222',
             paper_bgcolor='#222222',
