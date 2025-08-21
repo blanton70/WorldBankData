@@ -31,7 +31,6 @@ year_data = data[data['year'] == selected_year]
 all_countries = sorted(year_data['country'].dropna().unique())
 available_indicators = sorted(year_data['indicator'].dropna().unique())
 
-# Layout: 2 columns - left for controls, right for plot
 col_controls, col_plot = st.columns([1, 3])
 
 with col_controls:
@@ -51,7 +50,6 @@ with col_controls:
             default=all_countries[:5],
             key="countries"
         )
-
     x_indicator = st.selectbox("X-axis Indicator", available_indicators, index=0, key="x_ind")
     y_indicator = st.selectbox("Y-axis Indicator", available_indicators, index=1, key="y_ind")
 
@@ -60,16 +58,22 @@ with col_plot:
     pivot = filtered.pivot(index="country", columns="indicator", values="value").reset_index()
 
     if x_indicator in pivot.columns and y_indicator in pivot.columns:
-        log_y = False  # default before radio buttons
+        # Radio buttons inside col_plot but below plot placeholder
+        y_scale = st.radio("Y-axis Scale", ["Linear", "Logarithmic"], horizontal=True, key="scale")
+
+        log_y = (y_scale == "Logarithmic")
+
         fig = px.scatter(
             pivot,
             x=x_indicator,
             y=y_indicator,
             text="country",
-            title=f"{y_indicator} vs {x_indicator} in {selected_year}",
+            title=f"{y_indicator} vs {x_indicator} in {selected_year} ({y_scale} scale)",
             height=600,
+            log_y=log_y
         )
         fig.update_traces(marker=dict(size=12), textposition="top center")
         st.plotly_chart(fig, use_container_width=True)
+
     else:
         st.warning("One or both selected indicators are not available for the chosen countries and year.")
