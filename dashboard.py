@@ -45,46 +45,51 @@ selected_year = st.slider("Select Year", min_year, max_year, value=max_year)
 # Filter data for the selected year
 year_data = data[data['year'] == selected_year]
 
-# Country selection
+# Get list of countries
 all_countries = sorted(year_data['country'].dropna().unique())
-st.subheader("Country Selection")
 
-select_all = st.checkbox("Select all countries", value=False)
+# --- Layout with columns ---
 
-if select_all:
-    selected_countries = st.multiselect(
-        "Select Countries",
-        options=all_countries,
-        default=all_countries
-    )
-else:
-    selected_countries = st.multiselect(
-        "Select Countries",
-        options=all_countries,
-        default=all_countries[:5]
-    )
+col1, col2, col3 = st.columns([2, 2, 2])
 
+with col1:
+    st.subheader("Country Selection")
+    select_all = st.checkbox("Select all countries", value=False)
+    if select_all:
+        selected_countries = st.multiselect(
+            "Select Countries",
+            options=all_countries,
+            default=all_countries,
+            key="countries"
+        )
+    else:
+        selected_countries = st.multiselect(
+            "Select Countries",
+            options=all_countries,
+            default=all_countries[:5],
+            key="countries"
+        )
 
-# Filter for selected countries
-filtered = year_data[year_data['country'].isin(selected_countries)]
+with col2:
+    available_indicators = sorted(year_data['indicator'].dropna().unique())
+    x_indicator = st.selectbox("X-axis Indicator", available_indicators, index=0, key="x_ind")
 
-# Pivot: one row per country, one column per indicator
-pivot = filtered.pivot(index="country", columns="indicator", values="value").reset_index()
+with col3:
+    y_indicator = st.selectbox("Y-axis Indicator", available_indicators, index=1, key="y_ind")
 
-# Get available indicators
-available_indicators = sorted(filtered['indicator'].dropna().unique())
-
-# Select indicators for plotting
-x_indicator = st.selectbox("X-axis Indicator", available_indicators, index=0)
-y_indicator = st.selectbox("Y-axis Indicator", available_indicators, index=1)
-
-# Toggle for linear/log scale
-y_scale = st.radio("Y-axis Scale", ["Linear", "Logarithmic"], horizontal=True)
+# Radio buttons for scale under columns (full width)
+st.markdown("---")
+y_scale = st.radio("Y-axis Scale", ["Linear", "Logarithmic"], horizontal=True, key="scale")
 log_y = y_scale == "Logarithmic"
 
-# --- Plotting ---
+# --- Filtering and Plotting ---
 
-# Ensure indicators are in the pivoted DataFrame
+filtered = year_data[year_data['country'].isin(selected_countries)]
+
+# Pivot to get one row per country, columns as indicators
+pivot = filtered.pivot(index="country", columns="indicator", values="value").reset_index()
+
+# Plot if indicators available
 if x_indicator in pivot.columns and y_indicator in pivot.columns:
     fig = px.scatter(
         pivot,
