@@ -72,4 +72,4 @@ with col_plot:
         fig.update_traces(marker=dict(size=12), textposition="top center")
         st.plotly_chart(fig, use_container_width=True)
     else:
-        st.warning("One or both selected indicators are not available for the chosen countries and
+        st.warning("One or both selected indicators are not available for the chosen countries and year.")
